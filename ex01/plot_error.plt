@@ -1,6 +1,6 @@
-datafile1 = "results/newton.txt"
-datafile2 = "results/linear_interpolation.txt"
-datafile3 = "results/bisection.txt"
+datafile1 = "result_newton.txt"
+datafile2 = "result_linear_interplation.txt"
+datafile3 = "result_bisection.txt"
 
 r = 7.53701168414018e-01; # root of the function
 
