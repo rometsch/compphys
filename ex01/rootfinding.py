@@ -5,28 +5,24 @@ Thomas Rometsch
 Solution to Excercise Sheet 1
 """
 
-from sympy import mpmath as mp;
+import numpy as np;
 
-N_max_iteration = 1000;
-
-mp.dps = 40;
 
 # Define function
 def f(x):
-    return mp.exp(mp.sqrt(5)*x) - 13.5*mp.cos(0.1*x) * 25*mp.power(x,4);
+    return np.exp(np.sqrt(5)*x) - 13.5*np.cos(0.1*x) + x*x*x*x*25;
 
 # Derivative of function f
 def fp(x):
-    return mp.sqrt(5)*mp.exp(mp.sqrt(5)*x) + 1.35*mp.sin(0.1*x) + 100*mp.power(x,3);
+    return np.sqrt(5)*np.exp(np.sqrt(5)*x) + 1.35*np.sin(0.1*x) + x*x*x*100;
 
 # Function to call a given method untill a certain accuracy is reached.
 # @param:
-# eps:      desired accuracy
+# tol:      desired accuracy
 # a0:       start point of inital interval
 # b0:       end point of inital interval
 # method:   method to be used
-# verbosity:    0 for minimal, 1 for file output, 2 for maximum
-def find_root(eps,a,b,method,verbosity=2):
+def find_root(tol,a,b,method,verbosity=2,N_max_iteration = 1000):
     print("# Finding root of f with {} method:".format(method.__name__));
     if verbosity == 1:
         print("# iteration \t delta \t r \t a \t b \t f(r)")
@@ -36,11 +32,12 @@ def find_root(eps,a,b,method,verbosity=2):
         Niter+=1;
         if verbosity == 2:
             print("iteration = {0:4d} \t delta = {1:.2e} \t r = {2:.14e} \t a =  {3:.4e} \t b = {4:.4e} \t f(r) = {5:.2e}".format(Niter,delta,r,a,b,f(r)));        
+# verbosity:    0 for minimal, 1 for file output, 2 for maximum
         if verbosity == 1:
             print("{0:4d} \t {1:.2e} \t {2:.14e} \t {3:.4e} \t {4:.4e} \t {5:.2e}".format(Niter,delta,r,a,b,f(r))); 
-        if delta<=eps:
+        if delta<=tol:
             break;
-    print("# After {0:d} iterations found root r = {1:.14e} with delta = {2:.3e}.".format(Niter,float(r),float(delta)));
+    print("# After {0:d} iterations found root r = {1:.14e} with delta = {2:.3e}.".format(Niter,r,delta));
 
 
 # implement bisection method
@@ -63,7 +60,7 @@ def lin_interpol(a,b):
         b=a;
     else:
         a=c;
-    return c,a,b,f(c);
+    return c,a,b,np.abs(f(c));
 
 # implement newtons method
 # here a = x_n
@@ -75,12 +72,13 @@ def newton(a,b):
 
 
 def main():
-    a = mp.mpf(0);
-    b = mp.mpf(1);
-    eps = mp.mpf(10**-18);
-    find_root(eps,a,b,bisection,0);
-    find_root(eps,a,b,lin_interpol,0);
-    find_root(eps,a,b,newton,0);
+    a = 0.0;
+    b = 1.0;
+    tol = 10**-14;
+    verbosity=2;
+    find_root(tol,a,b,bisection,verbosity);
+    find_root(tol,a,b,lin_interpol,verbosity);
+    find_root(tol,a,b,newton,verbosity);
 
 if __name__=="__main__":
     main();
