@@ -1,10 +1,10 @@
-datafile1 = "../results/newton.txt"
-datafile2 = "../results/linear_interpolation.txt"
-datafile3 = "../results/bisection.txt"
+datafile1 = "results/newton.txt"
+datafile2 = "results/linear_interpolation.txt"
+datafile3 = "results/bisection.txt"
 
 r = 7.53701168414018e-01; # root of the function
 
-outname='../errors.pdf';
+outname='errors.pdf';
 
 curve1='Newton'
 curve2='linear interpolation'
@@ -54,13 +54,13 @@ c2i = log(eps0)-log(k)/(1-m);
 fit fit_interpol_exponent(x) datafile2 using 1:(log(abs($3-r))) via c1i,c2i;
 
 fit_newton(x) = exp(fit_newton_exponent(x));
-fit_newton_exponent(x) = c1n+c2n*m**x;
+fit_newton_exponent(x) = c1n/(1-m)+(c2n-c1n/(1-m))*m**x;
 m = 2;
 k = 3.6;
-eps0 = 1;
+eps0 = 0.37;
 c1n = log(k);
-c2n = log(eps0)-log(k)/(1-m);
-fit [x=2:] fit_newton_exponent(x) datafile1 using 1:(log(abs($3-r))) via c1n,c2n,m;
+c2n = -0.9948;
+fit [x=5:] fit_newton_exponent(x) datafile1 using 1:(log(abs($3-r))) via c1n,m;
 
 
 # print fit results
