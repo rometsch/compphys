@@ -34,9 +34,20 @@ def integrate_2nd_newton_cotes(y,h):
     mask[-1] = 1;
     I = np.sum(y*mask)*h/3;
     # Calculate error.
-    err = np.abs(h/90*(y[0]-3*y[1]-y[2]-y[-3]-3*y[-2]+y[-1]));
+#    err = np.abs(h/90*(y[0]-3*y[1]-y[2]-y[-3]-3*y[-2]+y[-1]));
+    # Calculate error
+    # Sample the error at 10 % of the points. Thus use every 10th point.
+    # Only use points 2...N-2, thus indices 1...N-3 to be able to use 2nd order differentiation scheme.
+    err = 0;
+    stepsize = 5;
+    cnt = 0;
+    for n in range(2,N-2,stepsize):
+        cnt += 1;
+        err += 1.0/90*(y[n+2]-4*y[n+1]+6*y[n]-4*y[n-1]+y[n-2]);
+    err = np.abs(err*N/cnt);
     
-    return (I,err);
+    
+    return (I,err,h);
     
     
 def part_a():
@@ -61,18 +72,23 @@ def part_b():
         return np.abs(calc_psi(x,t,L,omega1,omega2))**2;
     
     def calc_P(t,xmin,xmax,L,omega1,omega2,N):
-        (data_vec,h) = sample_function(lambda x:calc_dPdx(x,t,L,omega1,omega2), xmin, xmax, N);
+        (data_vec,h) = sample_function(lambda x:calc_dPdx(x,t,L,omega1,omega2), xmin, xmax, N);        
         return integrate_2nd_newton_cotes(data_vec,h);
         
-    t = 0;
     L = 2.0;
     omega1 = 3.0;
     omega2 = 4.5;
 #    xmin = 0;
     xmin = 3./4*L;
     xmax = L;
-    N = 101;
-    print(calc_P(t,xmin,xmax,L,omega1,omega2,N));
+    for t in [0,np.pi/1.5]:
+        log = "# n\tE\th\n";
+        for n in range(5,503,2):
+            res = calc_P(t,xmin,xmax,L,omega1,omega2,n);
+            log += "{:d}\t{:.5e}\t{:.5e}\n".format(n,res[1],res[2]);
+        
+        with open("errors_t{:.3f}.txt".format(t), "w") as text_file:
+            text_file.write(log);
     
 def main():
     part_b();
