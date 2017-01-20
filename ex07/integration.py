@@ -18,25 +18,33 @@ def sample_function(function, limits, N):
     xmax = limits[1];
     (X,h) = np.linspace(xmin,xmax,N,retstep=True);   
     Y = function(X);
-    return (Y,X,h);
+    return (Y,h);
     
-def integrate_2nd_newton_cotes(y,h):
+def integrate_2nd_newton_cotes(function,limits,N):
     """
     Intergrate the datapoints, which are assumed to be equally spaced
     with stepsize h and an odd number of datapoints using 
     the Newton-Cotes method with a 2nd order interpolation polynomial.
     """
-    N = y.size;
-    if (N%2==0):
-        print("Number of datapoints is not odd. Can not use this method");
-        return;
+    (ys,h) = sample_function(function,limits,N);
+    if (N%2==1):        
     # Create multiplication mask to perform the sum with numpy array multiplication.
     # This is a lot faster than naive loops in python.
-    mask = 2*np.ones(N)+2*(np.arange(N)%2);
-    mask[0] = 1;
-    mask[-1] = 1;
-    I = np.sum(y*mask)*h/3;
-    
+        mask = 2*np.ones(N)+2*(np.arange(N)%2);
+        mask[0] = 1;
+        mask[-1] = 1;
+        I = np.sum(ys*mask)*h/3;
+    else:
+        # If number of datapoints is even, use a 4 point rule for 
+        # the last subinterval. Its also of order h^5.
+        mask = h/3*2*np.ones(N)+2*(np.arange(N)%2);
+        mask[0] = h/3;
+        mask[-1] = 3*h/8;
+        mask[-2] = 9*h/8;
+        mask[-3] = 9*h/8;
+        mask[-4] = h/3 + 3*h/8; # first term from 3 point rule, second term from 4 point rule
+        I = np.sum(ys*mask);
+            
     return (I,h);
     
 def integrate_trapezoidal(function,limits,N):
@@ -44,7 +52,7 @@ def integrate_trapezoidal(function,limits,N):
     Intergrate function using the trapezoidal rule over the interval
     given by the two numbers in limits.
     """
-    (ys,xs,h) = sample_function(function,limits,N);
+    (ys,h) = sample_function(function,limits,N);
     mask = 2.0*np.ones(N);
     mask[0] = 1;
     mask[-1] = 1;
@@ -232,7 +240,7 @@ def test_method(method,N_min,N_max):
     np.savetxt("f3/{}.txt".format(integrator_name), np.array([h3,err3]).transpose());
 
 def main():
-    test_method(integrate_gauss_legendre_8,5,501)
+    test_method(integrate_2nd_newton_cotes,5,501)
 #    print(integrate_gauss_legendre_2(f2,[-1,3],5))
     
 if __name__=="__main__":
