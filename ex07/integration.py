@@ -102,24 +102,52 @@ def integrate_gauss_legendre_4(function,limits,N):
         I += integrate_gauss_legendre_single_4(function,[xmin+n*h,xmin+(n+1)*h]);    
     return (I,h);
     
-def integrate_gauss_legendre_single_8(function,limits):
+#def integrate_gauss_legendre_single_8(function,limits):
+#    """ Integrate function over a single interval given by limits. """
+#    # map x values
+#    xmin = limits[0];
+#    xmax = limits[1];    
+#    def t(x):
+#        return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
+#    x = np.array([   t(-0.9602898565), t(0.9602898565),
+#                    t(-0.7966664774), t(0.7966664774),
+#                    t(-0.5255324099), t(0.5255324099),
+#                    t(-0.1834346425), t(0.1834346425) ]);
+#    A = np.array([  0.1012285363, 0.1012285363,
+#                    0.2223810345, 0.2223810345,
+#                    0.3137066459, 0.3137066459,
+#                    0.3626837834, 0.3626837834 ]);
+#    # Calculate integral.s
+#    I = 0.5*(xmax-xmin)*np.sum(A*function(x));
+#    return I;
+    
+def integrate_gauss_legendre_single_8(f,limits):
     """ Integrate function over a single interval given by limits. """
     # map x values
     xmin = limits[0];
     xmax = limits[1];    
     def t(x):
         return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
-    x = np.array([   t(-0.9602898565), t(0.9602898565),
-                    t(-0.7966664774), t(0.7966664774),
-                    t(-0.5255324099), t(0.5255324099),
-                    t(-0.1834346425), t(0.1834346425) ]);
-    A = np.array([  0.1012285363, 0.1012285363,
-                    0.2223810345, 0.2223810345,
-                    0.3137066459, 0.3137066459,
-                    0.3626837834, 0.3626837834 ]);
+    x1 = t(-0.9602898565);
+    x2 = t(0.9602898565);
+    x3 = t(-0.7966664774);
+    x4 = t(0.7966664774);
+    x5 = t(-0.5255324099);
+    x6 = t(0.5255324099);
+    x7 = t(-0.1834346425);
+    x8 = t(0.1834346425);
+    A1 = 0.1012285363;
+    A2 = 0.1012285363;
+    A3 = 0.2223810345;
+    A4 = 0.2223810345;
+    A5 = 0.3137066459;
+    A6 = 0.3137066459;
+    A7 = 0.3626837834;
+    A8 = 0.3626837834;
     # Calculate integral.s
-    I = 0.5*(xmax-xmin)*np.sum(A*function(x));
+    I = 0.5*(xmax-xmin)*(A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4) + A5*f(x5) + A6*f(x6) + A7*f(x7) + A8*f(x8));
     return I;
+    
     
 def integrate_gauss_legendre_8(function,limits,N):
     xmin = limits[0];
