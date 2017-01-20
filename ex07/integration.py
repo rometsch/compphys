@@ -5,17 +5,20 @@ Created on Sun Dec  4 11:54:10 2016
 @author: thomas
 """
 import numpy as np;
+import matplotlib.pyplot as plt;
 
 
-def sample_function(function, xmin, xmax, N):
+def sample_function(function, limits, N):
     """
     Calculate an array filled with values of the provided function
-    evaluated at N equally spaced points between xmin and xmax.
+    evaluated at N equally spaced points between the two numbers in limits.
     Return array of funtion values, array of x values and the stepsize.
     """
+    xmin = limits[0];
+    xmax = limits[1];
     (X,h) = np.linspace(xmin,xmax,N,retstep=True);   
     Y = function(X);
-    return (Y,h);
+    return (Y,X,h);
     
 def integrate_2nd_newton_cotes(y,h):
     """
@@ -36,17 +39,95 @@ def integrate_2nd_newton_cotes(y,h):
     
     return (I,h);
     
-def integrate_trapezoidal(y,h):
+def integrate_trapezoidal(function,limits,N):
     """
-    Intergrate datapoints, which are assumed to be equally spaced
-    with stepsize h using the trapezoidal rule.
+    Intergrate function using the trapezoidal rule over the interval
+    given by the two numbers in limits.
     """
-    N = y.size;
-    mask = 2*np.ones(N);
+    (ys,xs,h) = sample_function(function,limits,N);
+    mask = 2.0*np.ones(N);
     mask[0] = 1;
     mask[-1] = 1;
-    I = np.sum(y*mask)*h/2;
+    I = np.sum(ys*mask)*h/2;
     
+    return (I,h);
+    
+def integrate_gauss_legendre_single_2(function,limits):
+    """ Integrate function over a single interval given by limits. """
+    # map x values
+    xmin = limits[0];
+    xmax = limits[1];    
+    def t(x):
+        return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
+    x1 = t(-0.5773502692);
+    x2 = t(0.5773502692);
+    # Calculate integral.s
+    I = 0.5*(xmax-xmin)*(function(x1) + function(x2));
+    return I;
+    
+def integrate_gauss_legendre_2(function,limits,N):
+    xmin = limits[0];
+    xmax = limits[1];
+    h = (xmax - xmin)/N;
+    I = 0;
+    for n in range(N):
+        I += integrate_gauss_legendre_single_2(function,[xmin+n*h,xmin+(n+1)*h]);
+    return (I,h);
+
+def integrate_gauss_legendre_single_4(f,limits):
+    """ Integrate function over a single interval given by limits. """
+    # map x values
+    xmin = limits[0];
+    xmax = limits[1];    
+    def t(x):
+        return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
+    x1 = t(-0.8611363116);
+    x2 = t(0.8611363116);
+    x3 = t(-0.3394810436);
+    x4 = t(0.3394810436);
+    A1 = 0.3478548451;
+    A2 = 0.3478548451;
+    A3 = 0.6521451549;
+    A4 = 0.6521451549;
+    # Calculate integral.s
+    I = 0.5*(xmax-xmin)*(A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4));
+    return I;
+    
+def integrate_gauss_legendre_4(function,limits,N):
+    xmin = limits[0];
+    xmax = limits[1];
+    h = (xmax - xmin)/N;
+    I = 0;
+    for n in range(N):
+        I += integrate_gauss_legendre_single_4(function,[xmin+n*h,xmin+(n+1)*h]);    
+    return (I,h);
+    
+def integrate_gauss_legendre_single_8(function,limits):
+    """ Integrate function over a single interval given by limits. """
+    # map x values
+    xmin = limits[0];
+    xmax = limits[1];    
+    def t(x):
+        return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
+    x = np.array([   t(-0.9602898565), t(0.9602898565),
+                    t(-0.7966664774), t(0.7966664774),
+                    t(-0.5255324099), t(0.5255324099),
+                    t(-0.1834346425), t(0.1834346425) ]);
+    A = np.array([  0.1012285363, 0.1012285363,
+                    0.2223810345, 0.2223810345,
+                    0.3137066459, 0.3137066459,
+                    0.3626837834, 0.3626837834 ]);
+    # Calculate integral.s
+    I = 0.5*(xmax-xmin)*np.sum(A*function(x));
+    return I;
+    
+def integrate_gauss_legendre_8(function,limits,N):
+    xmin = limits[0];
+    xmax = limits[1];
+    h = (xmax - xmin)/N;
+    I = 0;
+    for n in range(N):
+        I += integrate_gauss_legendre_single_8(function,[xmin+n*h,xmin+(n+1)*h]);    
     return (I,h);
 
 def f1(x):
@@ -59,60 +140,72 @@ def f3(x):
     y = (x<0)*np.exp(2*x) + (x>=0)*(x-2*np.cos(x)+4);
     return y;
     
-def I1(x):
+def I1():
     # Solution of integral 1.
     return 0.5*(np.exp(np.pi/2)-1);
     
-def I2(x):
+def I2():
     # Solution of integral 2.
-    return (np.exp(4)-1)/np.exp(1);
+    return np.exp(3)-np.exp(-1);
 
-def I3(x):
+def I3():
     # Solution of integral 3.
     return 1-2*np.sin(1)-0.5/np.exp(2)+4;
     
-def part_a():
-    """
-    Calculate everything for part a of the exercise sheet.
-    """
-    def func(x):
-        return x + x**3;
-    (Y,h) = sample_function(func,0,1,7);
-    print(integrate_2nd_newton_cotes(Y,h))        
-
-
-def part_b():
-    """
-    Calculate everything for part a of the exercise sheet.
-    """
-
-    def calc_psi(x,t,L,omega1,omega2):
-        return (0<=x)*(x<=L)*(np.sin(np.pi*x/L)*np.exp(-1j*omega1*t)+np.sin(2*np.pi/L)*np.exp(-1j*omega2*t))/np.sqrt(L);
+def plot_error(E,h,name):
+    """Plot error vs. h in a log-log plot"""
+    print(np.min(h));    
+    plt.clf();
+#    for errs,hs in zip(E,h):
+#        plt.loglog(hs,errs);
+    plt.loglog(h,E);    
+    plt.title(name);
+    plt.xlabel("h");
+    plt.ylabel("error");
+    plt.grid();
+    plt.show();
     
-    def calc_dPdx(x,t,L,omega1,omega2):
-        return np.abs(calc_psi(x,t,L,omega1,omega2))**2;
+def test_method_on_function(method,func,limits,analytical_solution,N_min,N_max):
+    """ Test the provided method by integrating the function func over
+        over the interval given by limits and compare it to the solution
+        obtained by calling the sol_ana.
+        Repead the test for all integer values as number of datapoints between
+        N_min and N_max and return errors and hs.
+    """
     
-    def calc_P(t,xmin,xmax,L,omega1,omega2,N):
-        (data_vec,h) = sample_function(lambda x:calc_dPdx(x,t,L,omega1,omega2), xmin, xmax, N);        
-        return integrate_2nd_newton_cotes(data_vec,h);
+    errors = [];
+    hs = [];
+    for N in range(N_min,N_max+1):
+        (I,h) = method(func,limits,N);
+        error = np.abs(I - analytical_solution);
         
-    L = 2.0;
-    omega1 = 3.0;
-    omega2 = 4.5;
-#    xmin = 0;
-    xmin = 3./4*L;
-    xmax = L;
-    for t in [0,np.pi/1.5]:
-        log = "# n\tE\th\n";
-        for n in range(5,503,2):
-            res = calc_P(t,xmin,xmax,L,omega1,omega2,n);
-            log += "{:d}\t{:.5e}\t{:.5e}\n".format(n,res[1],res[2]);
+        errors.append(error);
+        hs.append(h);
         
-        with open("errors_t{:.3f}.txt".format(t), "w") as text_file:
-            text_file.write(log);
+    return (errors,hs);
     
+def test_method(method,N_min,N_max):
+    """ Test the given method on all three functions and make a plot
+        showing error vs h"""
+    limits1 = [0,np.pi/2];
+    limits2 = [-1.0,3.0];
+    limits3 = [-1.0,1.0];
+    
+    integrator_name = method.__name__;    
+    
+    (err1,h1) = test_method_on_function(method,f1,limits1,I1(),N_min,N_max);
+    
+    np.savetxt("f1/{}.txt".format(integrator_name), np.array([h1,err1]).transpose());
+    
+    (err2,h2) = test_method_on_function(method,f2,limits2,I2(),N_min,N_max);
+    np.savetxt("f2/{}.txt".format(integrator_name), np.array([h2,err2]).transpose());
+    
+    (err3,h3) = test_method_on_function(method,f3,limits3,I3(),N_min,N_max);
+    np.savetxt("f3/{}.txt".format(integrator_name), np.array([h3,err3]).transpose());
+
 def main():
-    part_b();
+    test_method(integrate_gauss_legendre_8,5,501)
+#    print(integrate_gauss_legendre_2(f2,[-1,3],5))
     
 if __name__=="__main__":
     main();
