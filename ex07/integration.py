@@ -37,15 +37,17 @@ def integrate_2nd_newton_cotes(function,limits,N):
     else:
         # If number of datapoints is even, use a 4 point rule for 
         # the last subinterval. Its also of order h^5.
-        mask = h/3*2*np.ones(N)+2*(np.arange(N)%2);
-        mask[0] = h/3;
-        mask[-1] = 3*h/8;
-        mask[-2] = 9*h/8;
-        mask[-3] = 9*h/8;
-        mask[-4] = h/3 + 3*h/8; # first term from 3 point rule, second term from 4 point rule
-        I = np.sum(ys*mask);
+        mask = 2*np.ones(N)+2*(np.arange(N)%2);
+        mask[0] = 1;
+        mask[-1] = 9.0/8;
+        mask[-2] = 27.0/8;
+        mask[-3] = 27.0/8;
+        mask[-4] = 1 + 9.0/8; # first term from 3 point rule, second term from 4 point rule
+        I = h/3*np.sum(ys*mask);
             
     return (I,h);
+    
+    
     
 def integrate_trapezoidal(function,limits,N):
     """
@@ -173,8 +175,9 @@ def f2(x):
     return np.exp(x);
     
 def f3(x):
+    
     y = (x<0)*np.exp(2*x) + (x>=0)*(x-2*np.cos(x)+4);
-    return y;
+    return np.array(y);
     
 def I1():
     # Solution of integral 1.

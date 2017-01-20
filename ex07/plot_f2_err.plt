@@ -15,6 +15,11 @@ title3 = "gauss legendre 4"
 file4 = "integrate_gauss_legendre_8.txt"
 title4 = "gauss legendre 8"
 
+file4 = "integrate_gauss_legendre_8.txt"
+title4 = "gauss legendre 8"
+
+file5 = "integrate_2nd_newton_cotes.txt"
+title5 = "Simpson 3/8"
 
 set title "integration of function f2"
 
@@ -29,6 +34,7 @@ set xlabel "h"
 set ylabel "error"
 
 plot folder.file1 u 1:2 title title1, folder.file2 u 1:2 title title2, \
-    folder.file3 u 1:2 title title3, folder.file4 u 1:2 title title4
+    folder.file3 u 1:2 title title3, folder.file4 u 1:2 title title4, \
+    folder.file5 u 1:2 title title5
 
 pause -1
