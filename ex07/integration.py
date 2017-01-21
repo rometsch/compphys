@@ -21,11 +21,6 @@ def sample_function(function, limits, N):
     return (Y,h);
     
 def integrate_2nd_newton_cotes(function,limits,N):
-    """
-    Intergrate the datapoints, which are assumed to be equally spaced
-    with stepsize h and an odd number of datapoints using 
-    the Newton-Cotes method with a 2nd order interpolation polynomial.
-    """
     (ys,h) = sample_function(function,limits,N);
     if (N%2==1):        
     # Create multiplication mask to perform the sum with numpy array multiplication.
@@ -47,6 +42,66 @@ def integrate_2nd_newton_cotes(function,limits,N):
             
     return (I,h);
     
+#def integrate_simpson(function,limits,N):
+#    (ys,h) = sample_function(function,limits,N);
+#    I = 0;
+#    if ((N-1)%3==0):        
+#        # Number of panels divisible by 3. Use standard form.
+#        mask = 3*np.ones(N)-1*((np.arange(N)-1)%3==0);
+#        mask[0] = 1;
+#        mask[-1] = 1;
+#        I = 3*h/8*np.sum(ys*mask);
+#    if ((N-1)%3==1):
+#        # Number of panels not divisible by 3 with one extra point.
+#        # Use 3 point rule for the last 5 points (same order h^5).
+#        if (N>5):        
+#            mask1 = 3*np.ones(N-5)-1*((np.arange(N-5)-1)%3==0);
+#            mask1[0] = 1;
+#            mask1[-1] = 1;
+#            I1 = 3*h/8*np.sum(ys[0:N-5]*mask1);
+#        else:
+#            I1 = 0;
+#        mask2 = np.array([1,4,2,4,1]);
+#        I2 = h/3*np.sum(ys[-5:]*mask2);
+#        I = I1 + I2;
+#    if ((N-1)%3==2):
+#        # Number of panels not divisible by 3 with 2 extra points.
+#        # Use 3 point rule for the last 3 points (same order h^5).
+#        mask1 = 3*np.ones(N-3)-1*((np.arange(N-3)-1)%3==0);
+#        mask1[0] = 1;
+#        mask1[-1] = 1;
+#        I1 = 3*h/8*np.sum(ys[0:N-3]*mask1);
+#        mask2 = np.array([1,2,1]);
+#        I2 = h/3*np.sum(ys[-3:]*mask2);
+#        I = I1 + I2;
+#
+#    return (I,h);
+    
+def integrate_simpson(function,limits,N):
+    (ys,h) = sample_function(function,limits,N);
+    if ((N-1)%3==0):        
+        # Number of panels divisible by 3. Use standard form.
+        mask = 3*np.ones(N)-1*((np.arange(N)-1)%3==0);
+        mask[0] = 1;
+        mask[-1] = 1;
+        I = 3*h/8*np.sum(ys*mask);
+    if ((N-1)%3==1):
+        # Number of panels not divisible by 3 with one extra point.
+        # Add 2 datapoints with 0 value.
+        ys = np.append(ys,[0.0,0.0]);
+        mask = 3*np.ones(N+2)-1*((np.arange(N+2)-1)%3==0);
+        mask[0] = 1;
+        mask[-1] = 1;
+        I = 3*h/8*np.sum(ys*mask);
+    if ((N-1)%3==2):
+        # Number of panels not divisible by 3 with two extra point.
+        # Add one datapoints with 0 value.
+        ys = np.append(ys,[0.0]);
+        mask = 3*np.ones(N+1)-1*((np.arange(N+1)-1)%3==0);
+        mask[0] = 1;
+        mask[-1] = 1;
+        I = 3*h/8*np.sum(ys*mask);
+    return (I,h);
     
     
 def integrate_trapezoidal(function,limits,N):
@@ -72,7 +127,7 @@ def integrate_gauss_legendre_single_2(function,limits):
     x1 = t(-0.5773502692);
     x2 = t(0.5773502692);
     # Calculate integral.s
-    I = 0.5*(xmax-xmin)*(function(x1) + function(x2));
+    I = (function(x1) + function(x2));
     return I;
     
 def integrate_gauss_legendre_2(function,limits,N):
@@ -82,6 +137,7 @@ def integrate_gauss_legendre_2(function,limits,N):
     I = 0;
     for n in range(N):
         I += integrate_gauss_legendre_single_2(function,[xmin+n*h,xmin+(n+1)*h]);
+    I = 0.5*h*I;
     return (I,h);
 
 def integrate_gauss_legendre_single_4(f,limits):
@@ -100,7 +156,7 @@ def integrate_gauss_legendre_single_4(f,limits):
     A3 = 0.6521451549;
     A4 = 0.6521451549;
     # Calculate integral.s
-    I = 0.5*(xmax-xmin)*(A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4));
+    I = (A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4));
     return I;
     
 def integrate_gauss_legendre_4(function,limits,N):
@@ -109,7 +165,8 @@ def integrate_gauss_legendre_4(function,limits,N):
     h = (xmax - xmin)/N;
     I = 0;
     for n in range(N):
-        I += integrate_gauss_legendre_single_4(function,[xmin+n*h,xmin+(n+1)*h]);    
+        I += integrate_gauss_legendre_single_4(function,[xmin+n*h,xmin+(n+1)*h]);
+    I = 0.5*h*I;
     return (I,h);
     
 #def integrate_gauss_legendre_single_8(function,limits):
@@ -155,7 +212,7 @@ def integrate_gauss_legendre_single_8(f,limits):
     A7 = 0.3626837834;
     A8 = 0.3626837834;
     # Calculate integral.s
-    I = 0.5*(xmax-xmin)*(A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4) + A5*f(x5) + A6*f(x6) + A7*f(x7) + A8*f(x8));
+    I = (A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4) + A5*f(x5) + A6*f(x6) + A7*f(x7) + A8*f(x8));
     return I;
     
     
@@ -165,7 +222,8 @@ def integrate_gauss_legendre_8(function,limits,N):
     h = (xmax - xmin)/N;
     I = 0;
     for n in range(N):
-        I += integrate_gauss_legendre_single_8(function,[xmin+n*h,xmin+(n+1)*h]);    
+        I += integrate_gauss_legendre_single_8(function,[xmin+n*h,xmin+(n+1)*h]);
+    I = 0.5*h*I;
     return (I,h);
 
 def f1(x):
@@ -243,8 +301,12 @@ def test_method(method,N_min,N_max):
     np.savetxt("f3/{}.txt".format(integrator_name), np.array([h3,err3]).transpose());
 
 def main():
-    test_method(integrate_2nd_newton_cotes,5,501)
-#    print(integrate_gauss_legendre_2(f2,[-1,3],5))
+#    test_method(integrate_2nd_newton_cotes,5,501)
+#    test_method(integrate_trapezoidal,5,501)
+#    test_method(integrate_gauss_legendre_2,5,501)
+#    test_method(integrate_gauss_legendre_4,5,501)
+#    test_method(integrate_gauss_legendre_8,5,501)
+    test_method(integrate_simpson,5,501)
     
 if __name__=="__main__":
     main();
