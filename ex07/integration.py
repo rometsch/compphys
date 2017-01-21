@@ -16,13 +16,13 @@ def sample_function(function, limits, N):
     """
     xmin = limits[0];
     xmax = limits[1];
-    (X,h) = np.linspace(xmin,xmax,N,retstep=True);   
+    (X,h) = np.linspace(xmin,xmax,N,retstep=True);
     Y = function(X);
     return (Y,h);
-    
+
 def integrate_2nd_newton_cotes(function,limits,N):
     (ys,h) = sample_function(function,limits,N);
-    if (N%2==1):        
+    if (N%2==1):
     # Create multiplication mask to perform the sum with numpy array multiplication.
     # This is a lot faster than naive loops in python.
         mask = 2*np.ones(N)+2*(np.arange(N)%2);
@@ -30,7 +30,7 @@ def integrate_2nd_newton_cotes(function,limits,N):
         mask[-1] = 1;
         I = np.sum(ys*mask)*h/3;
     else:
-        # If number of datapoints is even, use a 4 point rule for 
+        # If number of datapoints is even, use a 4 point rule for
         # the last subinterval. Its also of order h^5.
         mask = 2*np.ones(N)+2*(np.arange(N)%2);
         mask[0] = 1;
@@ -39,13 +39,13 @@ def integrate_2nd_newton_cotes(function,limits,N):
         mask[-3] = 27.0/8;
         mask[-4] = 1 + 9.0/8; # first term from 3 point rule, second term from 4 point rule
         I = h/3*np.sum(ys*mask);
-            
+
     return (I,h);
-    
+
 #def integrate_simpson(function,limits,N):
 #    (ys,h) = sample_function(function,limits,N);
 #    I = 0;
-#    if ((N-1)%3==0):        
+#    if ((N-1)%3==0):
 #        # Number of panels divisible by 3. Use standard form.
 #        mask = 3*np.ones(N)-1*((np.arange(N)-1)%3==0);
 #        mask[0] = 1;
@@ -54,7 +54,7 @@ def integrate_2nd_newton_cotes(function,limits,N):
 #    if ((N-1)%3==1):
 #        # Number of panels not divisible by 3 with one extra point.
 #        # Use 3 point rule for the last 5 points (same order h^5).
-#        if (N>5):        
+#        if (N>5):
 #            mask1 = 3*np.ones(N-5)-1*((np.arange(N-5)-1)%3==0);
 #            mask1[0] = 1;
 #            mask1[-1] = 1;
@@ -76,10 +76,10 @@ def integrate_2nd_newton_cotes(function,limits,N):
 #        I = I1 + I2;
 #
 #    return (I,h);
-    
+
 def integrate_simpson(function,limits,N):
     (ys,h) = sample_function(function,limits,N);
-    if ((N-1)%3==0):        
+    if ((N-1)%3==0):
         # Number of panels divisible by 3. Use standard form.
         mask = 3*np.ones(N)-1*((np.arange(N)-1)%3==0);
         mask[0] = 1;
@@ -102,8 +102,8 @@ def integrate_simpson(function,limits,N):
         mask[-1] = 1;
         I = 3*h/8*np.sum(ys*mask);
     return (I,h);
-    
-    
+
+
 def integrate_trapezoidal(function,limits,N):
     """
     Intergrate function using the trapezoidal rule over the interval
@@ -114,14 +114,14 @@ def integrate_trapezoidal(function,limits,N):
     mask[0] = 1;
     mask[-1] = 1;
     I = np.sum(ys*mask)*h/2;
-    
+
     return (I,h);
-    
+
 def integrate_gauss_legendre_single_2(function,limits):
     """ Integrate function over a single interval given by limits. """
     # map x values
     xmin = limits[0];
-    xmax = limits[1];    
+    xmax = limits[1];
     def t(x):
         return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
     x1 = t(-0.5773502692);
@@ -129,7 +129,7 @@ def integrate_gauss_legendre_single_2(function,limits):
     # Calculate integral.s
     I = (function(x1) + function(x2));
     return I;
-    
+
 def integrate_gauss_legendre_2(function,limits,N):
     xmin = limits[0];
     xmax = limits[1];
@@ -144,7 +144,7 @@ def integrate_gauss_legendre_single_4(f,limits):
     """ Integrate function over a single interval given by limits. """
     # map x values
     xmin = limits[0];
-    xmax = limits[1];    
+    xmax = limits[1];
     def t(x):
         return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
     x1 = t(-0.8611363116);
@@ -158,7 +158,7 @@ def integrate_gauss_legendre_single_4(f,limits):
     # Calculate integral.s
     I = (A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4));
     return I;
-    
+
 def integrate_gauss_legendre_4(function,limits,N):
     xmin = limits[0];
     xmax = limits[1];
@@ -168,12 +168,12 @@ def integrate_gauss_legendre_4(function,limits,N):
         I += integrate_gauss_legendre_single_4(function,[xmin+n*h,xmin+(n+1)*h]);
     I = 0.5*h*I;
     return (I,h);
-    
+
 #def integrate_gauss_legendre_single_8(function,limits):
 #    """ Integrate function over a single interval given by limits. """
 #    # map x values
 #    xmin = limits[0];
-#    xmax = limits[1];    
+#    xmax = limits[1];
 #    def t(x):
 #        return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
 #    x = np.array([   t(-0.9602898565), t(0.9602898565),
@@ -187,12 +187,12 @@ def integrate_gauss_legendre_4(function,limits,N):
 #    # Calculate integral.s
 #    I = 0.5*(xmax-xmin)*np.sum(A*function(x));
 #    return I;
-    
+
 def integrate_gauss_legendre_single_8(f,limits):
     """ Integrate function over a single interval given by limits. """
     # map x values
     xmin = limits[0];
-    xmax = limits[1];    
+    xmax = limits[1];
     def t(x):
         return 0.5*(xmin + xmax) + x*0.5*(xmax - xmin);
     x1 = t(-0.9602898565);
@@ -214,8 +214,8 @@ def integrate_gauss_legendre_single_8(f,limits):
     # Calculate integral.s
     I = (A1*f(x1) + A2*f(x2) + A3*f(x3) + A4*f(x4) + A5*f(x5) + A6*f(x6) + A7*f(x7) + A8*f(x8));
     return I;
-    
-    
+
+
 def integrate_gauss_legendre_8(function,limits,N):
     xmin = limits[0];
     xmax = limits[1];
@@ -228,19 +228,19 @@ def integrate_gauss_legendre_8(function,limits,N):
 
 def f1(x):
     return np.exp(x)*np.cos(x);
-    
+
 def f2(x):
     return np.exp(x);
-    
+
 def f3(x):
-    
+
     y = (x<0)*np.exp(2*x) + (x>=0)*(x-2*np.cos(x)+4);
     return np.array(y);
-    
+
 def I1():
     # Solution of integral 1.
     return 0.5*(np.exp(np.pi/2)-1);
-    
+
 def I2():
     # Solution of integral 2.
     return np.exp(3)-np.exp(-1);
@@ -248,20 +248,20 @@ def I2():
 def I3():
     # Solution of integral 3.
     return 1-2*np.sin(1)-0.5/np.exp(2)+4;
-    
+
 def plot_error(E,h,name):
     """Plot error vs. h in a log-log plot"""
-    print(np.min(h));    
+    print(np.min(h));
     plt.clf();
 #    for errs,hs in zip(E,h):
 #        plt.loglog(hs,errs);
-    plt.loglog(h,E);    
+    plt.loglog(h,E);
     plt.title(name);
     plt.xlabel("h");
     plt.ylabel("error");
     plt.grid();
     plt.show();
-    
+
 def test_method_on_function(method,func,limits,analytical_solution,N_min,N_max):
     """ Test the provided method by integrating the function func over
         over the interval given by limits and compare it to the solution
@@ -269,44 +269,44 @@ def test_method_on_function(method,func,limits,analytical_solution,N_min,N_max):
         Repead the test for all integer values as number of datapoints between
         N_min and N_max and return errors and hs.
     """
-    
+
     errors = [];
     hs = [];
     for N in range(N_min,N_max+1):
         (I,h) = method(func,limits,N);
         error = np.abs(I - analytical_solution);
-        
+
         errors.append(error);
         hs.append(h);
-        
+
     return (errors,hs);
-    
+
 def test_method(method,N_min,N_max):
     """ Test the given method on all three functions and make a plot
         showing error vs h"""
     limits1 = [0,np.pi/2];
     limits2 = [-1.0,3.0];
     limits3 = [-1.0,1.0];
-    
-    integrator_name = method.__name__;    
-    
+
+    integrator_name = method.__name__;
+
     (err1,h1) = test_method_on_function(method,f1,limits1,I1(),N_min,N_max);
-    
+
     np.savetxt("f1/{}.txt".format(integrator_name), np.array([h1,err1]).transpose());
-    
+
     (err2,h2) = test_method_on_function(method,f2,limits2,I2(),N_min,N_max);
     np.savetxt("f2/{}.txt".format(integrator_name), np.array([h2,err2]).transpose());
-    
+
     (err3,h3) = test_method_on_function(method,f3,limits3,I3(),N_min,N_max);
     np.savetxt("f3/{}.txt".format(integrator_name), np.array([h3,err3]).transpose());
 
 def main():
-#    test_method(integrate_2nd_newton_cotes,5,501)
-#    test_method(integrate_trapezoidal,5,501)
-#    test_method(integrate_gauss_legendre_2,5,501)
-#    test_method(integrate_gauss_legendre_4,5,501)
-#    test_method(integrate_gauss_legendre_8,5,501)
+    test_method(integrate_2nd_newton_cotes,5,501)
+    test_method(integrate_trapezoidal,5,501)
+    test_method(integrate_gauss_legendre_2,5,501)
+    test_method(integrate_gauss_legendre_4,5,501)
+    test_method(integrate_gauss_legendre_8,5,501)
     test_method(integrate_simpson,5,501)
-    
+
 if __name__=="__main__":
     main();
