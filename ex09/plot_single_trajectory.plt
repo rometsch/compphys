@@ -3,7 +3,7 @@ reset
 
 file = "single_trajectory.txt"
 
-set title "Lorenz Attractor, sigma = 10, R= 28, beta = 8/3, v0 = (5,5,5)"
+set title "Lorenz Attractor, sigma = 10, R= 28, beta = 8/3, v_0 = (5,5,5)"
 
 set box
 
