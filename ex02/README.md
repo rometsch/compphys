@@ -2,7 +2,7 @@
 All code is written in Python. Make sure to use Python version 3!
 
 ## Nonlinear Systems
-Solution to Ex A1.
+Solution to Ex A.
 
 To find all roots of the the nonlinear system execute `find_all_roots.py`.
 
