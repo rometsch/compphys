@@ -1,28 +1,28 @@
 clear
 reset
 
-file1 = "d1.0e-03.txt"
-title1 = "dt = 1e-3"
-file2 = "d5.0e-04.txt"
-title2 = "dt = 5e-4"
-file3 = "d1.0e-06.txt"
-title3 = "dt = 1e-6"
-
-set title "Lorenz Attractor, sigma = 10, R= 28, beta = 8/3\nDistance of trajectory for inital conditions (5,5,5) and (5,5,5+1e-5)"
+file1 = "RK4.txt"
+title1 = "RK4"
+file2 = "Adams_Multon_WoCorr.txt"
+title2 = "Adams Multon without Corr"
+file3 = "Adams_Multon_Corr.txt"
+title3 = "Adams Multon with Corr"
 
 set box
 
 set grid
 
-set key right bottom
+set key right top
 
-set logscale y
+set logscale xy
 
-set format y "%.1e"
+set format x "%.0e"
+set format y "%.0e"
 
-set xlabel "t"
-set ylabel "d"
+set xlabel "h"
+set ylabel "error"
 
-plot file1 u 1:2 title title1 pt 1, file2 u 1:2 title title2 pt 2#, file3 u 1:2 title title3 with dots
+plot file1 u (2/$1):2 title title1 pt 1, file2 u (2/$1):2 title title2 pt 2, \
+      file3 u (2/$1):2 title title3 pt 4
 
 pause -1
