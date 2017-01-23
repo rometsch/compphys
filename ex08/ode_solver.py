@@ -40,9 +40,8 @@ def adams_multon_solver(F,x0,y0,x_final,N_steps,use_corrector=True):
         ys[n] = RK4_step(F,xs[n-1],ys[n-1],h);
 
     for n in range(4,N_steps):
-        y_new = adams_multon_step(F,xs[n-3:n],ys,h,use_corrector);
-        ys = np.array([ys[-3],ys[-2],ys[-1],y_new]);
-        print(ys,xs[n-3:n])
+        y_new = adams_multon_step(F,xs[n-3:n+1],ys,h,use_corrector);
+        ys = np.append(ys[1:],y_new);
         
     return ys[-1];
         
