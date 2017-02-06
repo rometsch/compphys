@@ -59,7 +59,7 @@ def is_square(mat):
     else:
         return False;
     
-def solve_gauss(mat, vec):
+def solve_gauss(mat, vec, pivot=True):
     '''Solve the matrix vector equation M*x = b using the Gauss algorithm. '''
     M = np.copy(mat);
     b = np.copy(vec);
@@ -69,31 +69,69 @@ def solve_gauss(mat, vec):
         print("Dimensions of matrix and vector don't match!");
         return;
     # Gauss algorithm
-    for n in range(N_rows):
+    for n in range(N_rows-1):
+        if (pivot):
+            # Find maximum pivotal element
+            ind_max = np.argmax(np.abs(M[:,n]));
+            # Exchange if needed
+            if (ind_max > n):
+                # Use fancy python swapping
+                ind = [n,ind_max];
+                M[ind[0],:], M[ind[1],:] = M[ind[1],:].copy(), M[ind[0],:].copy();
+                b[ind[0]], b[ind[1]] = b[ind[1]].copy(), b[ind[0]].copy();
         for k in range(n+1,N_rows):
             factor = M[k,n]/M[n,n];
             M[k,n:] -= factor*M[n,n:];
             b[k] -= factor*b[n];
+    
     # Check whether upper diagonal
     if not(is_upper_diagonal(M)):
         print("Matrix is not upper diagonal!");
         print(M);
-    sol = solve_lin_sys_updiag(M,b);
+    x = solve_lin_sys_updiag(M,b);
     det = 1.0;
     for n in range(N_rows):
-        det *= M[n,n];
-    return (sol,det);
+        det *= M[n,n];             
+        
+    return (x,det);
         
 
-def part_a():
+def part_2():
+    print("#-------------------------------")
+    print("# Numerical Methods lab 3")
+    print("# Part 2")
+    print("#-------------------------------")
     M = np.array([[2.0,0.1,-0.2],
                   [0.05,4.2,0.032],
                   [0.12,-0.07,5.0]]);
     b = np.array([10.0,11.0,12.0]);
-    (x,det) = solve_gauss(M,b);
+    (x,det) = solve_gauss(M,b,pivot=False);
     print("solution vector: x = ",x);
     print("det(M) = ",det);
     b_test = mul_mat_vec(M,x);
-    print("test: M*x = ",b_test);
+    print("test: M*x - b = ",b_test - b);
+    print()
     
-part_a();
+def part_3():
+    print("#-------------------------------")
+    print("# Numerical Methods lab 3")
+    print("# part 3")
+    print("#-------------------------------")
+    M =  np.array([[1.0,1.0,0.0],
+                  [2.0,2.0,-2.0],
+                  [0.0,3.0,15.0]]);
+    b = np.array([1.0,-2.0,33.0]);
+    
+    x,det = solve_gauss(M,b);
+    print("calculate with pivoting:");
+    print("solution vector: x = ",x)
+    print("det(A) = ",det);
+    b_test = mul_mat_vec(M,x);
+    print("test: M*x - b = ",b_test-b);
+
+def main():
+    part_2();
+    part_3();    
+    
+if __name__=="__main__":
+    main();
