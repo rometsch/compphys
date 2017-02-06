@@ -59,9 +59,11 @@ def is_square(mat):
     else:
         return False;
     
-def solve_gauss(mat, b):
+def solve_gauss(mat, vec):
     '''Solve the matrix vector equation M*x = b using the Gauss algorithm. '''
-    N_rows = mat.shape[0];
+    M = np.copy(mat);
+    b = np.copy(vec);
+    N_rows = M.shape[0];
     N_vec_len = b.shape[0];
     if (N_vec_len != N_rows):
         print("Dimensions of matrix and vector don't match!");
@@ -69,18 +71,17 @@ def solve_gauss(mat, b):
     # Gauss algorithm
     for n in range(N_rows):
         for k in range(n+1,N_rows):
-            factor = mat[k,n]/mat[n,n];
-            mat[k,n:] -= factor*mat[n,n:];
+            factor = M[k,n]/M[n,n];
+            M[k,n:] -= factor*M[n,n:];
             b[k] -= factor*b[n];
     # Check whether upper diagonal
-    if not(is_upper_diagonal(mat)):
+    if not(is_upper_diagonal(M)):
         print("Matrix is not upper diagonal!");
-        print(mat);
-    sol = solve_lin_sys_updiag(mat,b);
+        print(M);
+    sol = solve_lin_sys_updiag(M,b);
     det = 1.0;
-    print(mat)
     for n in range(N_rows):
-        det *= mat[n,n];
+        det *= M[n,n];
     return (sol,det);
         
 
@@ -90,10 +91,9 @@ def part_a():
                   [0.12,-0.07,5.0]]);
     b = np.array([10.0,11.0,12.0]);
     (x,det) = solve_gauss(M,b);
-    print("solution = ",x);
-    print("det = ",det);
-    
+    print("solution vector: x = ",x);
+    print("det(M) = ",det);
     b_test = mul_mat_vec(M,x);
-    print("test: b_test = ",b_test);
+    print("test: M*x = ",b_test);
     
 part_a();
